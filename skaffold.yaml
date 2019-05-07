@@ -1,0 +1,30 @@
+apiVersion: skaffold/v1beta2
+kind: Config
+build:
+  artifacts:
+  - image: changeme
+    context: .
+    docker: {}
+  tagPolicy:
+    envTemplate:
+      template: '{{.DOCKER_REGISTRY}}/cloudcat-meow/bdd-spring-1557239726:{{.VERSION}}'
+  local: {}
+deploy:
+  kubectl: {}
+profiles:
+- name: dev
+  build:
+    artifacts:
+    - docker: {}
+    tagPolicy:
+      envTemplate:
+        template: '{{.DOCKER_REGISTRY}}/cloudcat-meow/bdd-spring-1557239726:{{.DIGEST_HEX}}'
+    local: {}
+  deploy:
+    helm:
+      releases:
+      - name: bdd-spring-1557239726
+        chartPath: charts/bdd-spring-1557239726
+        setValueTemplates:
+          image.repository: '{{.DOCKER_REGISTRY}}/cloudcat-meow/bdd-spring-1557239726'
+          image.tag: '{{.DIGEST_HEX}}'
